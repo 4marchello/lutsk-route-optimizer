@@ -458,25 +458,6 @@ Lutsk National Technical University (LNTU)
 - Methodology selection
 - Work review
 
-### Acknowledgments
-
-**Lutsk City Council**  
-For the "Lutsk Klikuns" project initiative and support of tourism development.
-
-**Google Maps API**  
-For providing accurate pedestrian distance data.
-
-**Python Community**  
-For open-source libraries and development tools:
-- Tkinter - graphical interface
-- Python Standard Library - core functions
-
-**Scientific Publications**  
-Research based on works by:
-- Applegate et al. (2006) - The Traveling Salesman Problem
-- Croes (1958) - 2-opt algorithm
-- Helsgaun (2000) - Lin-Kernighan heuristic
-
 ## Disclaimer
 
 This program is provided "as is" without any warranties. The authors are not responsible for:
@@ -494,7 +475,6 @@ This program is provided "as is" without any warranties. The authors are not res
 - Carry water and snacks
 - Inform loved ones about your route
 
-## Additional Resources
 
 ### Useful Links
 
