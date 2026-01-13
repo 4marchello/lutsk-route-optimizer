@@ -275,29 +275,29 @@ In the "Start" field, specify the sculpture code from which you'll begin.
 
 **Available codes:**
 
-| Code | Sculpture Name | Location |
-|------|----------------|----------|
-| A1 | Radyk Zadovolenyi | Central park (default) |
-| B2 | Zustrichayko | |
-| C3 | Hnat | |
-| D4 | Vasyl "Soloveiko" | |
-| E5 | Franyo | |
-| F6 | Khvatsko i Prudko | |
-| G7 | Knyzhko | |
-| H8 | Semen Hust | |
-| I9 | Zirko | |
-| J10 | Trilinko | |
-| K11 | Muzyka | |
-| L12 | Vertun | |
-| M13 | Vartko i Vartko | |
-| N14 | Klikun Andriy | |
-| O15 | Stepan | |
-| P16 | Kavus | |
-| Q17 | Kliuchnyk | |
-| R18 | Providnyk | |
-| S19 | Bratko i Bratko | |
-| T20 | Vohnar | |
-| U21 | Mykytovych | |
+| Code | Sculpture Name | 
+|------|----------------|
+| A1 | Radyk Zadovolenyi |
+| B2 | Zustrichayko |
+| C3 | Hnat |
+| D4 | Vasyl "Soloveiko" |
+| E5 | Franyo |
+| F6 | Khvatsko i Prudko |
+| G7 | Knyzhko |
+| H8 | Semen Hust |
+| I9 | Zirko |
+| J10 | Trilinko |
+| K11 | Muzyka |
+| L12 | Vertun |
+| M13 | Vartko i Vartko |
+| N14 | Klikun Andriy |
+| O15 | Stepan |
+| P16 | Kavus |
+| Q17 | Kliuchnyk |
+| R18 | Providnyk |
+| S19 | Bratko i Bratko |
+| T20 | Vohnar |
+| U21 | Mykytovych |
 
 **How to change:**
 1. Click on the "Start" field
