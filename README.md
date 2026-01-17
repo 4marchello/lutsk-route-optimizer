@@ -3,6 +3,7 @@
 ## 📋 Table of Contents
 
 - [What the Code Does](#what-the-code-does)
+- [Data Files](#data-files)
 - [How the Code Works](#how-the-code-works)
 - [Setup Instructions](#setup-instructions)
 - [Program Usage Instructions](#program-usage-instructions)
@@ -32,6 +33,76 @@ Processing: Optimization algorithms
        ↓
 Output: Optimal route 11.5 km
 ```
+## Data Files
+
+The repository includes an Excel file **`Table_for_the_graph_Lutsk_Klikuns___2_.xlsx`** containing two important data sheets:
+
+### 1. Distance Matrix
+
+A 21×21 symmetric matrix containing pedestrian walking distances (in meters) between all pairs of sculptures. The distances were measured using Google Maps API along actual pedestrian paths.
+
+**Structure:**
+- **Rows/Columns:** Each sculpture (A1 through U21)
+- **Values:** Distance in meters between sculpture pairs
+- **Coordinates:** GPS coordinates for each sculpture location
+
+**Example:**
+```
+        A1    B2    C3    D4    ...
+A1      0     2850  3260  4390  ...
+B2      2850  0     1010  2080  ...
+C3      3260  1010  0     1150  ...
+...
+```
+
+This matrix represents a **complete weighted graph** where:
+- Vertices = sculptures
+- Edges = pedestrian paths
+- Weights = distances in meters
+
+### 2. Laplacian Matrix
+
+The **Laplacian matrix** (also called admittance matrix or Kirchhoff matrix) is a fundamental matrix representation in graph theory used for analyzing graph properties.
+
+**Mathematical definition:**
+```
+L = D - A
+```
+
+Where:
+- **L** = Laplacian matrix
+- **D** = Degree matrix (diagonal matrix with vertex degrees)
+- **A** = Adjacency matrix (connections between vertices)
+
+**For our complete graph:**
+```
+L[i,i] = 20     (degree of each vertex, since connected to all other 20 vertices)
+L[i,j] = -1     (for i ≠ j, indicating connection between vertices)
+```
+
+**Example:**
+```
+      A1   B2   C3   D4   ...
+A1    20   -1   -1   -1   ...
+B2    -1   20   -1   -1   ...
+C3    -1   -1   20   -1   ...
+...
+```
+
+**Applications of Laplacian Matrix:**
+- **Spectral graph theory:** Eigenvalues reveal graph connectivity
+- **Network analysis:** Studying information flow through the graph
+- **Community detection:** Identifying clusters in the graph
+- **Random walks:** Analyzing probabilistic path selection
+- **Graph partitioning:** Dividing the graph into subgraphs
+
+**Important properties:**
+1. Symmetric matrix (L = Lᵀ)
+2. Row and column sums equal zero
+3. Smallest eigenvalue is always 0
+4. Number of zero eigenvalues = number of connected components
+
+For our complete graph with 21 vertices, the Laplacian matrix helps verify that all sculptures are interconnected and validates the completeness of our distance data.
 
 ## How the Code Works
 
@@ -481,6 +552,6 @@ This program is provided "as is" without any warranties. The authors are not res
 - **Official "Lutsk Klikuns" project website:** https://www.lutskrada.gov.ua/pages/lutski-klykuny
 - **Interactive map of Lutsk:** https://www.google.com/maps
 
-**Last updated:** January 13, 2025
+**Last updated:** January 17, 2025
 
 **Glory to Ukraine!** 🇺🇦
