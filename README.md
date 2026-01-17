@@ -35,7 +35,7 @@ Output: Optimal route 11.5 km
 ```
 ## Data Files
 
-The repository includes an Excel file **`Table_for_the_graph_Lutsk_Klikuns___2_.xlsx`** containing two important data sheets:
+The repository includes an Excel file **`Table_for_the_graph_Lutsk_Klikuns___.xlsx`** containing two important data sheets:
 
 ### 1. Distance Matrix
 
