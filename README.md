@@ -275,7 +275,7 @@ python3 --version
 
 **Option A: Via Git**
 ```bash
-git clone [https://github.com/4marchello/lutsk-route-optimizer/tree/volyn-route]
+git clone https://github.com/4marchello/lutsk-route-optimizer/tree/volyn-route
 cd volyn-optimizer
 ```
 
