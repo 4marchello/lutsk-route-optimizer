@@ -275,7 +275,7 @@ python3 --version
 
 **Option A: Via Git**
 ```bash
-git clone https://github.com/4marchello/volyn-optimizer.git
+git clone [https://github.com/4marchello/lutsk-route-optimizer/tree/volyn-route]
 cd volyn-optimizer
 ```
 
@@ -512,7 +512,7 @@ When using the code or research results, please add a reference:
 ```
 O.V. Bondaruk. (2025). Kruskal's Algorithm Implementation for Museum Network 
 Analysis in Volyn Region. Lutsk National Technical University.
-GitHub repository: https://github.com/4marchello/volyn-optimizer
+GitHub repository: https://github.com/4marchello/lutsk-route-optimizer/tree/volyn-route
 ```
 
 ## Author Information and Acknowledgments
@@ -562,7 +562,7 @@ Lutsk National Technical University (LNTU)
 
 ### Project Repository
 
-**GitHub:** https://github.com/4marchello/volyn-route-optimizer
+**GitHub:** https://github.com/4marchello/lutsk-route-optimizer/tree/volyn-route
 
 ## Useful Links
 
