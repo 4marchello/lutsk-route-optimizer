@@ -1,191 +1,229 @@
-# Tourist Route Optimization Program "Lutsk Klikuns"
+# Kruskal's Algorithm for Minimum Spanning Tree (MST)
 
-## 📋 Table of Contents
-
+## Table of Contents
 - [What the Code Does](#what-the-code-does)
-- [Data Files](#data-files)
+- [Data Structure](#data-structure)
 - [How the Code Works](#how-the-code-works)
 - [Setup Instructions](#setup-instructions)
 - [Program Usage Instructions](#program-usage-instructions)
+- [Comparison with TSP Route](#comparison-with-tsp-route)
+- [Known Limitations](#known-limitations)
+- [Future Enhancements](#future-enhancements)
 - [License and Copyright](#license-and-copyright)
-- [Contact Information](#contact-information)
-- [Known Bugs](#known-bugs)
 - [Author Information and Acknowledgments](#author-information-and-acknowledgments)
+- [Contact Information](#contact-information)
+- [Useful Links](#useful-links)
 
 ## What the Code Does
 
-This program automatically builds the **shortest pedestrian route** for visiting all 21 historical sculptures "Lutsk Klikuns" in the city of Lutsk, Ukraine.
+This program implements Kruskal's algorithm to find the Minimum Spanning Tree (MST) for the museum road network in Volyn region. The MST provides a baseline for evaluating the efficiency of the TSP route optimization by comparing total distances.
 
 ### Key Features
-
-- Calculation of optimal route between 21 sculptures
-- Minimization of total distance (from 18 km to 11.5 km)
-- Graphical interface for ease of use
-- Ability to choose starting point
-- Output of detailed route with distance
+- Constructs minimum spanning tree connecting all museums
+- Uses Union-Find (Disjoint Set) data structure for cycle detection
+- Calculates theoretical minimum total distance to connect all museums
+- Provides benchmark for TSP route evaluation
+- Greedy approach ensuring optimal MST solution
 
 ### Workflow
-
 ```
-Input: 21 sculptures + starting point
+Input: Museums + road distances between them
        ↓
-Processing: Optimization algorithms
+Processing: Kruskal's Algorithm with Union-Find
        ↓
-Output: Optimal route 11.5 km
-```
-## Data Files
-
-The repository includes an Excel file **`Table_for_the_graph_Lutsk_Klikuns_.xlsx`** containing two important data sheets:
-
-### 1. Distance Matrix
-
-A 21×21 symmetric matrix containing pedestrian walking distances (in meters) between all pairs of sculptures. The distances were measured using Google Maps API along actual pedestrian paths.
-
-**Structure:**
-- **Rows/Columns:** Each sculpture (A1 through U21)
-- **Values:** Distance in meters between sculpture pairs
-- **Coordinates:** GPS coordinates for each sculpture location
-
-**Example:**
-```
-        A1    B2    C3    D4    ...
-A1      0     2850  3260  4390  ...
-B2      2850  0     1010  2080  ...
-C3      3260  1010  0     1150  ...
-...
+Output: MST edges + total minimum distance
 ```
 
-This matrix represents a **complete weighted graph** where:
-- Vertices = sculptures
-- Edges = pedestrian paths
-- Weights = distances in meters
+### Purpose in Research
 
-### 2. Laplacian Matrix
+The MST serves as a **lower bound benchmark** for evaluating the TSP route:
 
-The **Laplacian matrix** (also called admittance matrix or Kirchhoff matrix) is a fundamental matrix representation in graph theory used for analyzing graph properties.
+**MST (Minimum Spanning Tree):**
+- Connects all museums with minimum total distance
+- Forms a tree (no cycles)
+- Does NOT return to starting point
+- Represents theoretical minimum to "reach" all museums
 
-**Mathematical definition:**
+**TSP Route (Traveling Salesman):**
+- Visits all museums and returns to start
+- Forms a cycle (closed tour)
+- Must be longer than MST
+- Practical route for tourists
+
+**Evaluation Metric:**
 ```
-L = D - A
+Efficiency Ratio = TSP Distance / MST Distance
+
+Typical values:
+- Good optimization: 1.3 - 1.5
+- Average: 1.5 - 2.0
+- Poor: > 2.0
+```
+
+## Data Structure
+
+The program works with an edge list representing the road network between museums.
+
+### Input Format
+
+```
+Number of vertices: N (museums)
+Number of edges: M (road connections)
+
+Edge format: weight vertex1 vertex2
+
+Example:
+61.8 Museum1 Museum3
+59 Museum2 Museum3
+60.6 Museum1 Museum5
 ```
 
 Where:
-- **L** = Laplacian matrix
-- **D** = Degree matrix (diagonal matrix with vertex degrees)
-- **A** = Adjacency matrix (connections between vertices)
+- **Weight** = Distance in kilometers between museums
+- **Vertex1, Vertex2** = Museum names or identifiers
+- **Edges** = Direct road connections
 
-**For our complete graph:**
-```
-L[i,i] = 20     (degree of each vertex, since connected to all other 20 vertices)
-L[i,j] = -1     (for i ≠ j, indicating connection between vertices)
-```
+### Graph Properties
 
-**Example:**
-```
-      A1   B2   C3   D4   ...
-A1    20   -1   -1   -1   ...
-B2    -1   20   -1   -1   ...
-C3    -1   -1   20   -1   ...
-...
-```
-
-**Applications of Laplacian Matrix:**
-- **Spectral graph theory:** Eigenvalues reveal graph connectivity
-- **Network analysis:** Studying information flow through the graph
-- **Community detection:** Identifying clusters in the graph
-- **Random walks:** Analyzing probabilistic path selection
-- **Graph partitioning:** Dividing the graph into subgraphs
-
-**Important properties:**
-1. Symmetric matrix (L = Lᵀ)
-2. Row and column sums equal zero
-3. Smallest eigenvalue is always 0
-4. Number of zero eigenvalues = number of connected components
-
-For our complete graph with 21 vertices, the Laplacian matrix helps verify that all sculptures are interconnected and validates the completeness of our distance data.
+- **Undirected Graph:** Roads are bidirectional
+- **Weighted Graph:** Each edge has a distance value
+- **Connected Graph:** All museums must be reachable
+- **No Self-Loops:** Museums don't connect to themselves
+- **No Parallel Edges:** Only one direct road between any two museums
 
 ## How the Code Works
 
 ### The Problem
 
-A tourist wants to visit all 21 sculptures but doesn't know the most efficient order. Random search can lead to walking 15-18 km with many unnecessary "zigzags".
+Given all museums and road distances between them, find the minimum total distance needed to connect all museums with roads, without creating cycles.
 
-### The Solution
+### The Solution: Kruskal's Algorithm
 
-The program uses two algorithms sequentially:
+Kruskal's algorithm builds the MST by repeatedly adding the shortest available edge that doesn't create a cycle.
 
-#### Step 1: Greedy Algorithm
+---
 
-**What it does:**
-- Starts from the starting point (e.g., A1)
-- At each step, goes to the nearest unvisited sculpture
-- Continues until all 21 points are visited
+### Algorithm Steps
 
-**Analogy:**  
-Like a tourist who always chooses the nearest store until buying everything on the shopping list.
-
-**Result:**  
-Fast route (1 second computation), but not ideal - there may be "zigzags".
-
-#### Step 2: 2-opt Optimization
-
-**What it does:**
-- Takes the route from Step 1
-- Looks for places where the path crosses or makes unnecessary loops
-- Fixes these places, making the route shorter
-
-**Analogy:**  
-Like untangling a rope - if there's a crossing or knot, we untangle it to make the rope straighter.
-
-**Visual representation:**
-
+**Step 1: Sort Edges**
 ```
-BEFORE (zigzag):        AFTER (straighter):
-  A                        A
-   \                        \
-    B--D                     B
-   /    \                     \
-  C      E                     C
-                                \
-                                 D--E
+Sort all roads by distance (shortest first)
+Example:
+32 km:  Museum2 - Museum6
+52 km:  Museum2 - Museum7
+59 km:  Museum2 - Museum3
+60 km:  Museum3 - Museum7
+...
 ```
 
-**Result:**  
-Route without unnecessary loops, length decreases by 10-15%.
+**Step 2: Initialize Union-Find**
+```
+Each museum starts in its own group:
+{Museum1}, {Museum2}, {Museum3}, ...
+```
+
+**Step 3: Process Edges Greedily**
+```
+For each edge (shortest to longest):
+  If the two museums are in different groups:
+    Add edge to MST
+    Merge their groups
+  Else:
+    Skip (would create a cycle)
+  
+  Stop when we have N-1 edges (tree is complete)
+```
+
+**Visual Example:**
+
+```
+Initial state: 7 separate museums
+
+Add edge 1 (32 km): Museum2 - Museum6
+{Museum1}, {Museum2, Museum6}, {Museum3}, {Museum4}, {Museum5}, {Museum7}
+
+Add edge 2 (52 km): Museum2 - Museum7
+{Museum1}, {Museum2, Museum6, Museum7}, {Museum3}, {Museum4}, {Museum5}
+
+Add edge 3 (59 km): Museum2 - Museum3
+{Museum1}, {Museum2, Museum6, Museum7, Museum3}, {Museum4}, {Museum5}
+
+Continue until all museums connected...
+```
+
+---
+
+### Union-Find Data Structure
+
+The program uses **Union-Find (Disjoint Set Union)** to efficiently detect cycles:
+
+**Operations:**
+
+1. **Find(vertex):** Determine which group a museum belongs to
+   - Uses path compression for efficiency
+   - Returns the "root" representative of the group
+
+2. **Union(vertex1, vertex2):** Merge two groups
+   - Connects their root representatives
+   - Returns True if merge happened (different groups)
+   - Returns False if already in same group (would create cycle)
+
+**Example:**
+```python
+# Initially: each museum is its own root
+connections = {
+    "Museum1": "Museum1",
+    "Museum2": "Museum2",
+    ...
+}
+
+# After connecting Museum2 and Museum6:
+connections = {
+    "Museum1": "Museum1",
+    "Museum2": "Museum2",
+    "Museum6": "Museum2",  # Museum6 now points to Museum2
+    ...
+}
+```
+
+---
 
 ### Program Workflow Diagram
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │ 1. DATA INPUT                                       │
-│    • 21 sculptures                                  │
-│    • 210 distances between them (in meters)         │
-│    • Starting point (A1)                            │
+│    • Number of museums (vertices)                   │
+│    • Number of roads (edges)                        │
+│    • Edge list: weight vertex1 vertex2              │
 └──────────────────┬──────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────┐
-│ 2. GRAPH CONSTRUCTION                               │
-│    Function: rozbir()                               │
-│    Creates structure: vertices + edges with weights │
+│ 2. SORT EDGES                                       │
+│    Sort all edges by weight (ascending)             │
+│    Greedy approach: consider shortest roads first   │
 └──────────────────┬──────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────┐
-│ 3. GREEDY ALGORITHM                                 │
-│    Function: greedystart()                          │
-│    Builds initial route (~13 km)                    │
+│ 3. INITIALIZE UNION-FIND                            │
+│    Create disjoint sets for each museum             │
+│    Each museum starts in its own group              │
 └──────────────────┬──────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────┐
-│ 4. 2-OPT OPTIMIZATION                               │
-│    Function: pokrashchty()                          │
-│    Removes zigzags and crossings (~11.5 km)         │
+│ 4. KRUSKAL'S GREEDY SELECTION                       │
+│    For each edge (shortest to longest):             │
+│      • Check if vertices in different groups        │
+│      • If yes: add to MST, merge groups             │
+│      • If no: skip (would create cycle)             │
+│      • Stop when tree complete (N-1 edges)          │
 └──────────────────┬──────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────┐
-│ 5. RESULT OUTPUT                                    │
-│    • Visit sequence                                 │
-│    • Total distance                                 │
-│    • Walking time (~3 hours)                        │
+│ 5. OUTPUT RESULTS                                   │
+│    • List of MST edges                              │
+│    • Total weight (minimum distance)                │
+│    • Benchmark for TSP evaluation                   │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -194,228 +232,242 @@ Route without unnecessary loops, length decreases by 10-15%.
 ### Step 1: Installing Python
 
 #### Windows
-
 1. Download Python from the official website: https://www.python.org/downloads/
 2. Run the installer
 3. **IMPORTANT:** Check "Add Python to PATH"
-4. **IMPORTANT:** Check "tcl/tk and IDLE" (required for GUI)
-5. Click "Install Now"
-6. Restart your computer
+4. Click "Install Now"
+5. Restart your computer
 
-**Verification:**
+Verification:
 ```bash
 python --version
 ```
-
 Should display: `Python 3.x.x`
 
 #### macOS
-
 1. Open Terminal
 2. Install Homebrew (if not already installed):
-
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-
 3. Install Python:
-
 ```bash
-brew install python-tk
+brew install python
 ```
 
-**Verification:**
+Verification:
 ```bash
 python3 --version
 ```
 
 #### Linux (Ubuntu/Debian)
-
 ```bash
 sudo apt update
-sudo apt install python3 python3-tk
+sudo apt install python3 python3-pip
 ```
 
-**Verification:**
+Verification:
 ```bash
 python3 --version
 ```
 
 ### Step 2: Downloading the Program
 
-#### Option A: Via Git
-
+**Option A: Via Git**
 ```bash
-git clone https://github.com/4marchello/lutsk-route-optimizer.git
-cd lutsk-route-optimizer
+git clone https://github.com/4marchello/volyn-optimizer.git
+cd volyn-optimizer
 ```
 
-#### Option B: Download ZIP
-
+**Option B: Download ZIP**
 1. Download the ZIP archive from GitHub
 2. Extract to a convenient folder
 3. Open the folder in terminal/command prompt
 
 ### Step 3: Running the Program
 
-#### Windows
-
+**Windows:**
 ```bash
-python route_optimizer.py
+python kruskal_mst.py
 ```
 
-#### macOS/Linux
-
+**macOS/Linux:**
 ```bash
-python3 route_optimizer.py
+python3 kruskal_mst.py
 ```
-
-**Successful launch:**  
-A window with a graphical interface should open.
 
 ### Troubleshooting Installation
 
-**Error: "python is not recognized"**
-- **Cause:** Python not added to PATH
-- **Solution:** Reinstall Python with "Add to PATH" checked, or add manually to environment variables
-
-**Error: "No module named tkinter"**
-- **Cause:** Tkinter not installed
-- **Solution:**
-  - Ubuntu/Debian: `sudo apt install python3-tk`
-  - macOS: `brew install python-tk`
-
-**Error: "Permission denied"**
-- **Cause:** Insufficient permissions
-- **Solution:** `chmod +x route_optimizer.py`
+| Error | Cause | Solution |
+|-------|-------|----------|
+| "python is not recognized" | Python not added to PATH | Reinstall Python with "Add to PATH" checked |
+| "Permission denied" | Insufficient permissions | Run `chmod +x kruskal_mst.py` |
 
 ## Program Usage Instructions
 
-### Program Interface
+### Input Format
 
+The program will prompt you for input in the following order:
+
+**Step 1: Number of Vertices (Museums)**
 ```
-┌────────────────────────────────────────────────────┐
-│ Route Search (2-opt optimization)      [_][□][×]   │
-├────────────────────────────────────────────────────┤
-│                                                    │
-│ Edges (A B 10):                                    │
-│ ┌────────────────────────────────────────────────┐ │
-│ │ A1 B2 2850                                     │ │
-│ │ A1 C3 3260                                     │ │
-│ │ B2 C3 1010                                     │ │
-│ │ ... (210 lines)                                │ │
-│ └────────────────────────────────────────────────┘ │
-│                                                    │
-│ Start: [A1      ]                                  │
-│                                                    │
-│            [ Calculate ]                           │
-│                                                    │
-│ Result:                                            │
-│ ┌────────────────────────────────────────────────┐ │
-│ │ Route (Optimized):                             │ │
-│ │ A1 → B2 → C3 → D4 → E5 → ...                   │ │
-│ │                                                │ │
-│ │ Total weight: 11503.0                          │ │
-│ └────────────────────────────────────────────────┘ │
-└────────────────────────────────────────────────────┘
+Enter the number of vertex: 7
 ```
 
-### Step-by-Step Instructions
-
-#### Step 1: Data Input (optional)
-
-By default, the program already contains all 210 distances between sculptures.
-
-**Format:** `Vertex1 Vertex2 Distance_in_meters`
-
-**Example:**
+**Step 2: Number of Edges (Roads)**
 ```
-A1 B2 2850
-A1 C3 3260
-B2 C3 1010
+Enter the number of edges: 12
 ```
 
-**When to modify:**
-- Adding new sculptures
-- Changes in pedestrian paths (repairs, new roads)
-- Testing on custom data
-
-#### Step 2: Choosing Starting Point
-
-In the "Start" field, specify the sculpture code from which you'll begin.
-
-**Available codes:**
-
-| Code | Sculpture Name | 
-|------|----------------|
-| A1 | Radyk Zadovolenyi |
-| B2 | Zustrichayko |
-| C3 | Hnat |
-| D4 | Vasyl "Soloveiko" |
-| E5 | Franyo |
-| F6 | Khvatsko i Prudko |
-| G7 | Knyzhko |
-| H8 | Semen Hust |
-| I9 | Zirko |
-| J10 | Trilinko |
-| K11 | Muzyka |
-| L12 | Vertun |
-| M13 | Vartko i Vartko |
-| N14 | Klikun Andriy |
-| O15 | Stepan |
-| P16 | Kavus |
-| Q17 | Kliuchnyk |
-| R18 | Providnyk |
-| S19 | Bratko i Bratko |
-| T20 | Vohnar |
-| U21 | Mykytovych |
-
-**How to change:**
-1. Click on the "Start" field
-2. Delete the old value
-3. Enter new code (e.g., `G7`)
-
-#### Step 3: Route Calculation
-
-1. Click the **"Calculate"** button
-2. Wait 2-5 seconds (depends on computer speed)
-3. Result will appear in the "Result" field
-
-**What the result shows:**
-
+**Step 3: Edge List**
 ```
-Route (Optimized):
-A1 → B2 → C3 → D4 → E5 → F6 → L12 → N14 → 
-M13 → O15 → T20 → U21 → S19 → R18 → Q17 → 
-P16 → K11 → J10 → I9 → G7 → H8
-
-Total weight: 11503.0
+Enter (weight vertex1 vertex2):
+61.8 Museum1 Museum3
+59 Museum2 Museum3
+60.6 Museum1 Museum5
+32 Museum2 Museum6
+52 Museum2 Museum7
+60 Museum3 Museum7
+66 Museum3 Museum4
+77 Museum4 Museum7
+93 Museum3 Museum6
+151.1 Museum4 Museum5
 ```
 
-**Explanation:**
-- Arrows (→) show the visiting order
-- Total weight = total distance in meters (11503 m = 11.5 km)
+**Important:**
+- Enter each edge on a new line
+- Format: `weight vertex1 vertex2`
+- Use spaces to separate values
+- Vertex names can contain letters and numbers (no spaces)
 
-#### Step 4: Saving Results
+### Example Session
 
-**Option 1: Copy text**
-1. Select text in the "Result" field
-2. Press `Ctrl+C` (Windows/Linux) or `Cmd+C` (macOS)
-3. Paste into any text editor
+```
+Enter the number of vertex: 7
+Enter the number of edges: 10
+Enter (weight vertex1 vertex2):
+32 M2 M6
+52 M2 M7
+59 M2 M3
+60 M3 M7
+60.6 M1 M5
+61.8 M1 M3
+66 M3 M4
+77 M4 M7
+93 M3 M6
+151.1 M4 M5
 
-**Option 2: Screenshot**
-- Windows: `Win + Shift + S`
-- macOS: `Cmd + Shift + 4`
-- Linux: `Print Screen`
+MST:
+M2 - M6
+M2 - M7
+M2 - M3
+M1 - M5
+M1 - M3
+M3 - M4
+Total distance: 331.4
+```
 
-### Error Messages
+### Understanding the Output
 
-| Error Message | Cause | Solution |
-|--------------|-------|----------|
-| "Specify start" | "Start" field is empty | Enter sculpture code (A1, B2, etc.) |
-| "Start A1 is missing" | Specified sculpture not found | Check code correctness (capital letters!) |
-| "Graph is empty" | No distance data | Insert data in "Edges" field |
-| "Graph is disconnected" | Not all sculptures connected | Add missing edges or remove isolated vertices |
+**MST Edges:**
+- Lists the roads included in the minimum spanning tree
+- Format: `vertex1 - vertex2`
+- Each edge connects two museums
+
+**Total Weight:**
+- Sum of all edge weights in the MST
+- Represents minimum total distance to connect all museums
+- Measured in kilometers
+
+### Interpreting Results
+
+**What the MST tells you:**
+
+1. **Minimum Connection Distance:** The theoretical minimum distance needed to connect all museums
+2. **Critical Roads:** The roads in the MST are the most important for connectivity
+3. **TSP Benchmark:** Compare TSP route distance to MST distance to evaluate efficiency
+
+**Example Analysis:**
+```
+MST Total Distance: 331.4 km
+TSP Route Distance: 423.5 km
+Efficiency Ratio: 423.5 / 331.4 = 1.28
+
+Interpretation: The TSP route is only 28% longer than the theoretical 
+minimum, indicating good optimization.
+```
+
+## Comparison with TSP Route
+
+### Why Compare MST and TSP?
+
+The MST provides a **theoretical lower bound** for the TSP solution:
+
+| Metric | MST | TSP Route |
+|--------|-----|-----------|
+| **Purpose** | Connect all museums | Visit all museums and return |
+| **Structure** | Tree (no cycles) | Cycle (closed tour) |
+| **Edges** | N-1 edges | N edges |
+| **Starting Point** | Not specified | User-specified |
+| **End Point** | Not specified | Returns to start |
+| **Distance** | Minimum possible | Always ≥ MST |
+
+### Evaluation Method
+
+```
+Step 1: Calculate MST distance (this program)
+Step 2: Calculate TSP route distance (Dijkstra + Nearest Neighbor)
+Step 3: Compute efficiency ratio
+
+Efficiency Ratio = TSP Distance / MST Distance
+```
+
+### Quality Benchmarks
+
+| Ratio | Quality | Interpretation |
+|-------|---------|----------------|
+| 1.0 - 1.3 | Excellent | Near-optimal solution |
+| 1.3 - 1.5 | Good | Efficient route with minor improvements possible |
+| 1.5 - 2.0 | Acceptable | Reasonable route, some optimization potential |
+| > 2.0 | Poor | Significant optimization needed |
+
+**Note:** For most TSP heuristics, ratios of 1.2-1.5 are typical and considered good results.
+
+### Practical Example
+
+**Museum Network: 7 museums in Volyn region**
+
+```
+MST (Minimum Spanning Tree):
+- Total Distance: 331.4 km
+- Connects all museums with minimum roads
+- No return to start
+
+TSP Route (Nearest Neighbor):
+- Total Distance: 423.5 km
+- Visits all museums and returns to start
+- Practical tourist route
+
+Efficiency Analysis:
+- Ratio: 423.5 / 331.4 = 1.278
+- Quality: Excellent (under 1.3)
+- Interpretation: Only 27.8% overhead for completing the tour
+```
+
+## Known Limitations
+
+1. **Manual Input:** Requires manual entry of all edges (no file import)
+2. **No Visualization:** Text-only output without graphical tree display
+3. **Console Interface:** Command-line only, no GUI
+4. **Limited Error Handling:** Minimal validation of input format
+
+## Future Enhancements
+
+- File input support for loading edge data from CSV files
+- Graphical visualization of the minimum spanning tree
+- GUI interface for easier interaction
+- Automated comparison tool with TSP route optimizer
+- Export results to various formats (JSON, CSV, TXT)
 
 ## License and Copyright
 
@@ -423,55 +475,83 @@ Total weight: 11503.0
 
 **MIT License**
 
-Copyright (c) 2025 A. S. Osadchyi, M. S. Vavdiiuk by LNTU
+Copyright (c) 2025 O.V. Bondaruk by LNTU
 
-Permission is hereby granted, free of charge, to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of this software, provided that the above copyright notice is preserved.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-**THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.**
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ### Data Copyright
 
-- **Distances between sculptures:** Obtained from Google Maps API
-- **Coordinates:** Open data from Lutsk City Council
-- **Sculpture names:** "Lutsk Klikuns" project, Lutsk City Council
+- **Distances between museums:** Obtained from Google Maps API
+- **Coordinates:** Open data from regional authorities
+- **Museum information:** Public domain data
 
 ### Program Usage
 
 **ALLOWED:**
-- ✅ Personal use
-- ✅ Educational use
-- ✅ Code modification
-- ✅ Distribution with author attribution
-- ✅ Commercial use (with author's permission)
+
+- Personal use
+- Educational use
+- Code modification
+- Distribution with author attribution
+- Commercial use (with author's permission)
 
 **PROHIBITED:**
-- ❌ Claiming as your own work without attribution
-- ❌ Use for illegal purposes
-- ❌ Selling without author's permission
+
+- Claiming as your own work without attribution
+- Use for illegal purposes
+- Selling without author's permission
 
 ### Attribution
 
 When using the code or research results, please add a reference:
 
 ```
-A. S. Osadchyi, M. S. Vavdiiuk. (2025). Optimization of Pedestrian Tourist 
-Routes Using Graph Theory Algorithms: A Case Study of "Lutsk Klikuns". 
-GitHub repository: https://github.com/4marchello/lutsk-route-optimizer
+O.V. Bondaruk. (2025). Kruskal's Algorithm Implementation for Museum Network 
+Analysis in Volyn Region. Lutsk National Technical University.
+GitHub repository: https://github.com/4marchello/volyn-optimizer
 ```
+
+## Author Information and Acknowledgments
+
+### Lead Author
+
+**Olena Bondaruk**  
+Student PRM-11 course, Faculty of Architecture and Construction  
+Lutsk National Technical University, Lutsk, Ukraine
+
+**Contributions:**
+- Algorithm implementation
+- Software development (Python)
+- Testing and validation
+- Documentation writing
+- Research analysis
+
+### Scientific Supervisor
+
+**Inga Viktorivna Samonenko**  
+Associate Professor, Department of Applied Mathematics and Mechanics  
+PhD in Statistics from University of Sydney, Australia  
+Lutsk National Technical University (LNTU)
+
+**Contributions:**
+- Scientific supervision
+- Methodological design
+- Critical revision
 
 ## Contact Information
 
-### Project Authors
+### Project Author
 
-**Names:** Marko Vavdiiuk, Arsen Osadchyi  
-**Position:** Students, PRM-11 course  
+**Name:** Olena Bondaruk  
+**Position:** Student, PRM-11 course  
 **Faculty:** Architecture and Construction  
 **University:** Lutsk National Technical University  
-**City:** Lutsk, Ukraine
-
-### Contact Authors
-
-**Email:** markoo.vavdiyuk@gmail.com / jdtaaa000@gmail.com
+**City:** Lutsk, Ukraine  
+**Email:** 790bondaruk@gmail.com
 
 ### Scientific Supervisor
 
@@ -482,76 +562,17 @@ GitHub repository: https://github.com/4marchello/lutsk-route-optimizer
 
 ### Project Repository
 
-**GitHub:** https://github.com/4marchello/lutsk-route-optimizer
+**GitHub:** https://github.com/4marchello/volyn-route-optimizer
 
-## Known Bugs
+## Useful Links
 
-Currently no critical bugs reported.
+- **Map of museums of Volyn region:** https://www.google.com/maps/d/u/0/edit?mid=1dSWIoi4filqKmLLW23MJxzTv7fm8068&ll=51.23900446473489%2C24.791629999999987&z=8
+- **Museum network of Ukraine:** https://museum.mcsc.gov.ua/museums
+- **Kruskal's Algorithm (Wikipedia):** https://en.wikipedia.org/wiki/Kruskal%27s_algorithm
+- **Minimum Spanning Tree:** https://en.wikipedia.org/wiki/Minimum_spanning_tree
+- **Union-Find Data Structure:** https://en.wikipedia.org/wiki/Disjoint-set_data_structure
+- **Official Python documentation:** https://docs.python.org/
 
-### Known Limitations
+---
 
-1. **Maximum 50 vertices:** For larger numbers, computation time grows exponentially
-
-2. **Complete graph only:** If there's no path between two sculptures, route will be incomplete
-
-3. **No elevation consideration:** Program doesn't account for ascents/descents (only horizontal distance)
-
-4. **No GPX export:** Result cannot be loaded into GPS navigator (planned in v2.0)
-
-## Author Information and Acknowledgments
-
-### Lead Authors
-
-**Marko Vavdiiuk**  
-Student PRM-11 course, Faculty of Architecture and Construction  
-Lutsk National Technical University, Lutsk, Ukraine
-
-**Arsen Osadchyi**  
-Student PRM-11 course, Faculty of Architecture and Construction  
-Lutsk National Technical University, Lutsk, Ukraine
-
-**Contributions:**
-- Development of optimization algorithms
-- Software implementation (Python)
-- Collection of distance data
-- Testing and debugging
-- Documentation writing
-
-### Scientific Supervisor
-
-**Inga Viktorivna Samonenko**  
-Associate Professor, Department of Applied Mathematics and Mechanics  
-PhD in Statistics from University of Sydney, Australia  
-Lutsk National Technical University (LNTU)
-
-**Contributions:**
-- Scientific consulting
-- Methodology selection
-- Work review
-
-## Disclaimer
-
-This program is provided "as is" without any warranties. The authors are not responsible for:
-- Inaccuracies in distance data
-- Changes in city infrastructure
-- Closure of access to certain locations
-- Physical injuries during route navigation
-- Data loss or equipment damage
-
-### Recommendations
-
-- Always verify route relevance before departure
-- Consider weather conditions and time of day
-- Wear comfortable shoes and clothing
-- Carry water and snacks
-- Inform loved ones about your route
-
-
-### Useful Links
-
-- **Official "Lutsk Klikuns" project website:** https://www.lutskrada.gov.ua/pages/lutski-klykuny
-- **Interactive map of Lutsk:** https://www.google.com/maps
-
-**Last updated:** January 17, 2025
-
-**Glory to Ukraine!** 🇺🇦
+**Last updated:** January 24, 2025
