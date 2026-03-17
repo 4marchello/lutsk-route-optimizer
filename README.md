@@ -246,7 +246,7 @@ python3 --version
 #### Option A: Via Git
 
 ```bash
-git clone https://github.com/4marchello/lutsk-route-optimizer.git
+git clone https://github.com/4marchello/lutsk-route-optimizer/tree/lutsk-route
 cd lutsk-route-optimizer
 ```
 
@@ -456,7 +456,7 @@ When using the code or research results, please add a reference:
 ```
 A. S. Osadchyi, M. S. Vavdiiuk. (2025). Optimization of Pedestrian Tourist 
 Routes Using Graph Theory Algorithms: A Case Study of "Lutsk Klikuns". 
-GitHub repository: https://github.com/4marchello/lutsk-route-optimizer
+GitHub repository: https://github.com/4marchello/lutsk-route-optimizer/tree/lutsk-route
 ```
 
 ## Contact Information
